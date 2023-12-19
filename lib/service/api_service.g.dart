@@ -19,23 +19,23 @@ class _ApiService implements ApiService {
   String? baseUrl;
 
   @override
-  Future<List<ImageResponse>> getImages() async {
+  Future<ImageResponse> getImages(String query) async {
     const _extra = <String, dynamic>{};
-    final queryParameters = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{r'query': query};
     final _headers = <String, dynamic>{
-      r'Authorization': 'Client-ID lOwYkRhXb7OgyGquor9WgJsk1uBNU4zhYjtlWfvMFqo'
+      r'Authorization': 'Client-ID KR7Tcw-RNnurIM-7JDGj9S-5DUeFhVTx1YNxoR-vRkg'
     };
     _headers.removeWhere((k, v) => v == null);
     final Map<String, dynamic>? _data = null;
     final _result = await _dio
-        .fetch<List<dynamic>>(_setStreamType<List<ImageResponse>>(Options(
+        .fetch<Map<String, dynamic>>(_setStreamType<ImageResponse>(Options(
       method: 'GET',
       headers: _headers,
       extra: _extra,
     )
             .compose(
               _dio.options,
-              '/photos/random?count=100',
+              '/search/photos/?page=1&per_page=20&query=',
               queryParameters: queryParameters,
               data: _data,
             )
@@ -44,9 +44,37 @@ class _ApiService implements ApiService {
               _dio.options.baseUrl,
               baseUrl,
             ))));
-    var value = _result.data!
-        .map((dynamic i) => ImageResponse.fromJson(i as Map<String, dynamic>))
-        .toList();
+    final value = ImageResponse.fromJson(_result.data!);
+    return value;
+  }
+
+  @override
+  Future<CollectionResponse> getCollections() async {
+    const _extra = <String, dynamic>{};
+    final queryParameters = <String, dynamic>{};
+    final _headers = <String, dynamic>{
+      r'Authorization': 'Client-ID KR7Tcw-RNnurIM-7JDGj9S-5DUeFhVTx1YNxoR-vRkg'
+    };
+    _headers.removeWhere((k, v) => v == null);
+    final Map<String, dynamic>? _data = null;
+    final _result = await _dio
+        .fetch<Map<String, dynamic>>(_setStreamType<CollectionResponse>(Options(
+      method: 'GET',
+      headers: _headers,
+      extra: _extra,
+    )
+            .compose(
+              _dio.options,
+              '/collections',
+              queryParameters: queryParameters,
+              data: _data,
+            )
+            .copyWith(
+                baseUrl: _combineBaseUrls(
+              _dio.options.baseUrl,
+              baseUrl,
+            ))));
+    final value = CollectionResponse.fromJson(_result.data!);
     return value;
   }
 

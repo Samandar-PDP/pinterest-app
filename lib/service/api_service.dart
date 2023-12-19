@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart' hide Headers;
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:retrofit/retrofit.dart';
+import '../model/collection_response.dart';
 import '../model/image_response.dart';
 
 part 'api_service.g.dart';
@@ -10,10 +11,16 @@ abstract class ApiService {
   factory ApiService(Dio dio, {String baseUrl}) = _ApiService;
 
   @Headers({
-    "Authorization": "Client-ID lOwYkRhXb7OgyGquor9WgJsk1uBNU4zhYjtlWfvMFqo"
+    "Authorization": "Client-ID KR7Tcw-RNnurIM-7JDGj9S-5DUeFhVTx1YNxoR-vRkg"
   })
-  @GET('/photos/random?count=100')
-  Future<List<ImageResponse>> getImages();
+  @GET('/search/photos/?page=1&per_page=20&query=')
+  Future<ImageResponse> getImages(@Query('query') String query);
+
+  @Headers({
+    "Authorization": "Client-ID KR7Tcw-RNnurIM-7JDGj9S-5DUeFhVTx1YNxoR-vRkg"
+  })
+  @GET('/collections')
+  Future<CollectionResponse> getCollections();
 }
 
 Dio buildDioClient(String base) {

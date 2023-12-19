@@ -4,69 +4,101 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:gap/gap.dart';
 import 'package:pinterest_app/model/image_response.dart';
+import 'package:pinterest_app/screen/detail_screen.dart';
 import 'package:pinterest_app/service/repository.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   HomeScreen({super.key});
-  final _repo = Repository();
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final _repo = Repository();
+
+  final _categories = ['All', 'Football', 'Love', 'Nature', 'Food', 'Car'];
+
+  int _selectedIndex = 0;
+
+  /// 1
+  @override
   Widget build(BuildContext context) {
-    return DefaultTabController(
-      initialIndex: 0,
-      length: 1,
-      child: Scaffold(
+    return Scaffold(
         appBar: AppBar(
-          title: const PreferredSize(
-            preferredSize: Size.fromHeight(30.0),
-            child: TabBar(
-              isScrollable: true,
-              indicatorColor: Colors.black,
-              tabs: [
-                Tab(text: "All",)
-              ],
-            ),
-          ),
+          title: PreferredSize(
+              preferredSize: const Size.fromHeight(50.0),
+              child: SizedBox(
+                height: 50,
+                width: double.infinity,
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _categories.length,
+                  scrollDirection: Axis.horizontal,
+                  itemBuilder: (context, index) => Padding(
+                    padding: const EdgeInsets.all(6.0),
+                    child: GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedIndex = index;
+                          });
+                        },
+                        child: Chip(
+                          label: Text(_categories[index]),
+                          backgroundColor: _selectedIndex == index ? Colors.greenAccent.shade200 : Colors.transparent,
+                        )),
+                  ),
+                ),
+              )),
         ),
         body: FutureBuilder(
-          future: _repo.getImageList(),
+          future: _repo.getImageList(_categories[_selectedIndex]),
           builder: (context, snapshot) {
-            if(snapshot.data != null && snapshot.data?.isNotEmpty == true) {
+            if (snapshot.data != null && snapshot.data?.isNotEmpty == true) {
               return MasonryGridView.builder(
-                gridDelegate: const SliverSimpleGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2
-                ),
+                gridDelegate:
+                    const SliverSimpleGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2),
                 itemCount: snapshot.data?.length,
                 itemBuilder: (context, index) {
                   return _buildItem(snapshot.data?[index]);
                 },
               );
-            } else if(snapshot.connectionState == ConnectionState.done && snapshot.data?.isEmpty == true){
+            } else if (snapshot.connectionState == ConnectionState.done &&
+                snapshot.data?.isEmpty == true) {
               return const Center(child: Icon(CupertinoIcons.alarm_fill));
             } else {
-              return const Center(child: SpinKitFadingCircle(color: Colors.black),);
+              return const Center(
+                child: SpinKitFadingCircle(color: Colors.black),
+              );
             }
           },
-        )
-      ),
-    );
+        ));
   }
-  Widget _buildItem(ImageResponse? response) {
-    final color = "0xFF${response?.color?.substring(1, response.color?.length)}";
+
+  Widget _buildItem(Results? result) {
+    final color =
+        "0xFF${result?.color?.substring(1, result.color?.length)}";
     return Padding(
       padding: const EdgeInsets.all(4.0),
       child: InkWell(
-        onTap: () {},
+        borderRadius: BorderRadius.circular(20),
+        onTap: () {
+          Navigator.of(context).push(MaterialPageRoute(builder: (context) => DetailScreen(
+            result: result,
+          )));
+        },
         child: Ink(
-            decoration: BoxDecoration(
-                borderRadius:  BorderRadius.circular(20),
-                color: Color(int.parse(color))
-            ),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(20),
+              color: Color(int.parse(color))),
           child: Column(
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(12),
-                child: Image.network(response?.urls?.regular ?? "", fit: BoxFit.cover,
+                child: Image.network(
+                  result?.urls?.regular ?? "",
+                  fit: BoxFit.cover,
                   loadingBuilder: (BuildContext context, Widget child,
                       ImageChunkEvent? loadingProgress) {
                     if (loadingProgress == null) return child;
@@ -76,13 +108,14 @@ class HomeScreen extends StatelessWidget {
                         child: CircularProgressIndicator(),
                       ),
                     );
-                  },),
+                  },
+                ),
               ),
               const Gap(10),
-              Text(response?.user?.name ?? "",style: const TextStyle(
-                fontSize: 17,
-                color: Colors.white
-              ),),
+              Text(
+                result?.user?.name ?? "",
+                style: const TextStyle(fontSize: 17, color: Colors.white),
+              ),
               const Gap(5),
             ],
           ),
