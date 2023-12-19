@@ -52,27 +52,41 @@ class HomeScreen extends StatelessWidget {
     );
   }
   Widget _buildItem(ImageResponse? response) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Column(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(12),
-            child: Image.network(response?.urls?.regular ?? "", fit: BoxFit.cover,
-              loadingBuilder: (BuildContext context, Widget child,
-                  ImageChunkEvent? loadingProgress) {
-                if (loadingProgress == null) return child;
-                return const SizedBox(
-                  height: 100,
-                  child: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                );
-              },),
+    final color = "0xFF${response?.color?.substring(1, response.color?.length)}";
+    return Padding(
+      padding: const EdgeInsets.all(4.0),
+      child: InkWell(
+        onTap: () {},
+        child: Ink(
+            decoration: BoxDecoration(
+                borderRadius:  BorderRadius.circular(20),
+                color: Color(int.parse(color))
+            ),
+          child: Column(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(response?.urls?.regular ?? "", fit: BoxFit.cover,
+                  loadingBuilder: (BuildContext context, Widget child,
+                      ImageChunkEvent? loadingProgress) {
+                    if (loadingProgress == null) return child;
+                    return const SizedBox(
+                      height: 100,
+                      child: Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  },),
+              ),
+              const Gap(10),
+              Text(response?.user?.name ?? "",style: const TextStyle(
+                fontSize: 17,
+                color: Colors.white
+              ),),
+              const Gap(5),
+            ],
           ),
-          const Gap(10),
-          Text(response?.user?.name ?? "")
-        ],
+        ),
       ),
     );
   }
