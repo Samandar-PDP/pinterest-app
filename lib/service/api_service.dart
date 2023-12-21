@@ -20,7 +20,7 @@ abstract class ApiService {
     "Authorization": "Client-ID KR7Tcw-RNnurIM-7JDGj9S-5DUeFhVTx1YNxoR-vRkg"
   })
   @GET('/collections')
-  Future<CollectionResponse> getCollections();
+  Future<List<CollectionResponse>> getCollections();
 }
 
 Dio buildDioClient(String base) {
