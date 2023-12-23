@@ -75,7 +75,11 @@ class SearchScreen extends StatelessWidget {
         itemBuilder: (context, index ) {
           final currentCat = list?[index];
           return InkWell(
-            onTap: () {},
+            onTap: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) =>
+              ImageSearchScreen(query: currentCat?.title ?? "")));
+            },
             borderRadius: BorderRadius.circular(16),
             child: Ink(
               decoration: BoxDecoration(

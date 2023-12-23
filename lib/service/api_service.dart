@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart' hide Headers;
+import 'package:pinterest_app/model/user_response.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import 'package:retrofit/retrofit.dart';
 import '../model/collection_response.dart';
@@ -21,6 +22,12 @@ abstract class ApiService {
   })
   @GET('/collections')
   Future<List<CollectionResponse>> getCollections();
+
+  @Headers({
+    "Authorization": "Client-ID KR7Tcw-RNnurIM-7JDGj9S-5DUeFhVTx1YNxoR-vRkg"
+  })
+  @GET('/users/{username}')
+  Future<UserResponse> getProfile(@Path('username') String username);
 }
 
 Dio buildDioClient(String base) {

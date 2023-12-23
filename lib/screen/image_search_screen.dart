@@ -20,6 +20,8 @@ class _ImageSearchScreenState extends State<ImageSearchScreen> {
   final _searchController = TextEditingController();
   final _repo = Repository();
 
+  bool _isLoading = false; /// 1
+
   final List<Results> results = [];
 
   @override
@@ -31,9 +33,13 @@ class _ImageSearchScreenState extends State<ImageSearchScreen> {
   }
 
   void _searchImages(String query) async {
+    setState(() {
+      _isLoading = true; /// 2
+    });
     results.clear();
     final images = await _repo.getImageList(query);
     results.addAll(images);
+    _isLoading = false; /// 3
     setState(() {});
   }
 
@@ -42,21 +48,29 @@ class _ImageSearchScreenState extends State<ImageSearchScreen> {
     return Scaffold(
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(50),
-          child: TextField(
-            controller: _searchController,
-            decoration: InputDecoration(
-                border: InputBorder.none,
-                fillColor: Colors.grey.shade200,
-                contentPadding: EdgeInsets.all(20),
-                hintText: 'Search ideas...',
-                suffix: TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text("cancel"),
-                )
+          child: Padding(
+            padding: const EdgeInsets.only(top: 40.0),
+            child: TextField(
+              controller: _searchController,
+              textInputAction: TextInputAction.search,
+              onSubmitted: (value) {
+                _searchImages(value);
+              },
+              decoration: InputDecoration(
+                  border: InputBorder.none,
+                  fillColor: Colors.grey.shade200,
+                  contentPadding: EdgeInsets.all(20),
+                  hintText: 'Search ideas...',
+                  suffix: TextButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text("cancel"),
+                  )
+              ),
             ),
           ),
         ),
-        body: MasonryGridView.builder(
+        body: _isLoading ? const Center(child: CircularProgressIndicator()) :
+        MasonryGridView.builder(
           gridDelegate:
           const SliverSimpleGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2),
